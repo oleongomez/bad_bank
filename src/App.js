@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { useState } from "react";
+import Home from "./home";
+import Login from "./login";
+import Deposit from "./deposit";
+import Withdraw from "./withdraw";
+import Balance from "./balance";
+import AllData from "./alldata";
+import NavBar from "./navbar";
+import CreateAccount from "./createaccount";
+import { UserContext, HashRouter, Route } from "./context";
 
-function App() {
+const Spa = () => {
+  const [status, setContext] = useState({ users: [], current_user: undefined });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HashRouter>
+      <div>
+        <NavBar />
+        <UserContext.Provider value={{ status, setContext }}>
+          <Route path="/" exact component={Home} />
+          <Route path="/createaccount/" component={CreateAccount} />
+          <Route path="/login/" component={Login} />
+          <Route path="/deposit/" component={Deposit} />
+          <Route path="/withdraw/" component={Withdraw} />
+          <Route path="/balance/" component={Balance} />
+          <Route path="/alldata/" component={AllData} />
+        </UserContext.Provider>
+      </div>
+    </HashRouter>
   );
-}
+};
 
-export default App;
+export default Spa;
