@@ -37,10 +37,10 @@ Roles for users
 MIT (See LICENSE.md)
 
 ## Screenshots
-[1](https://postimg.cc/sB8NNYKn)
-[2](https://postimg.cc/4npSWhc5)
-[3](https://postimg.cc/y3hpxwK5)
-[4](https://postimg.cc/RJxbMvkK)
-[5](https://postimg.cc/XGCzSrzn)
-[6](https://postimg.cc/PPhF9rzk)
+![1](https://i.postimg.cc/3RJQW9GH/firebase-auth-server-00004.png)
+![2](https://i.postimg.cc/VshPLqL3/firebase-auth-server-00005.png)
+![3](https://i.postimg.cc/yxtMQHbV/firebase-auth-server-00006.png)
+![4](https://i.postimg.cc/HnrG9x3Z/firebase-auth-server-00007.png)
+![5](https://i.postimg.cc/Tw7Mbmj5/firebase-auth-server-00008.png)
+![6](https://i.postimg.cc/bN2cGZZd/firebase-auth-server-00009.png)
 
