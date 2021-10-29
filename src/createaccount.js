@@ -8,7 +8,8 @@ import {
   validatePwd,
 } from "./utils";
 import Card from "./context";
-
+import axios from "axios";
+let url = "http://localhost:3001/accounts/add"
 const CreateAccount = () => {
   const [show, setShow] = useState(true);
   const [show_required_email, setShowRequiredEmail] = useState(true);
@@ -28,15 +29,15 @@ const CreateAccount = () => {
     setShow(true);
   };
   const handleCreate = () => {
-    console.log(status);
-    if (userExists(name, status.users)) {
-      alert(`${name} already exists...`);
-      return;
-    }
-    if (emailExists(email, status.users)) {
-      alert(`${email} already exists....`);
-      return;
-    }
+    // console.log(status);
+    // if (userExists(name, status.users)) {
+    //   alert(`${name} already exists...`);
+    //   return;
+    // }
+    // if (emailExists(email, status.users)) {
+    //   alert(`${email} already exists....`);
+    //   return;
+    // }
     if (validateInputs(name, email, password)) {
       let new_user = {
         name: name,
@@ -44,11 +45,19 @@ const CreateAccount = () => {
         password: password,
         balance: 0,
       };
-      let new_user_list = [...status.users];
-      new_user_list.push(new_user);
-      setContext({ users: new_user_list, current_user: undefined });
-      setShow(false);
-      console.log(status);
+      axios.post(url, new_user).then((response) => {
+        if (response.data === "ALREADY_EXISTS") {
+          alert(`${new_user.name} or ${new_user.email} already exists`);
+          return;
+        } else {
+          setShow(false);
+        }
+      })
+      .catch(error => {
+        console.error(error)
+        alert(`${error} happened when processing this request`);
+        setShow(true)
+      });
     }
   };
   const validateInputs = (name, email, pwd) => {
