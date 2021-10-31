@@ -6,6 +6,7 @@ export const  userExists = (user_name, user_list) =>{
      return (user_list.find(user => user.email === email ))
  }
  export const  validateEmail = (email) => {
+   console.log(email)
    if (
      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
        email

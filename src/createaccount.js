@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "./context";
 import {
   userExists,
@@ -7,18 +7,61 @@ import {
   validateName,
   validatePwd,
 } from "./utils";
-import Card from "./context";
+import Card from "./card";
 import axios from "axios";
-let url = "http://localhost:3001/accounts/add"
+import { createAccountWithEmailAndPassword } from "./firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+let url = "http://localhost:3001/accounts/add";
 const CreateAccount = () => {
   const [show, setShow] = useState(true);
+  const [created, setCreated] = useState(false);
   const [show_required_email, setShowRequiredEmail] = useState(true);
   const [show_required_name, setShowRequiredName] = useState(true);
   const [show_required_password, setShowRequiredPassword] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { status, setContext } = useContext(UserContext);
+  let { status, setContext } = useContext(UserContext);
+  console.log(status);
+  useEffect(() => {
+    console.log(`Use effect: show: ${show} created: ${created}`)
+    const auth = getAuth();
+    if(created) {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("user logged in")
+        const uid = user.uid;
+        const email = user.email;
+
+        let new_user = {
+          unique_id: uid,
+          name: name,
+          email: email,
+          password: password,
+          balance: 0,
+        }
+        console.log("Here")
+      try{
+        axios
+          .post(url, new_user)
+          .then((response) => {
+            console.log(response);
+            setShow(false);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        }catch(error){
+          console.log('asdfasdfasdf')
+        }
+      } else {
+        //logout
+      }
+    });
+  }
+  }, []);
+
   const clearForm = () => {
     setName("");
     setShowRequiredName(true);
@@ -27,37 +70,15 @@ const CreateAccount = () => {
     setPassword("");
     setShowRequiredPassword(true);
     setShow(true);
+    setCreated(false)
   };
   const handleCreate = () => {
-    // console.log(status);
-    // if (userExists(name, status.users)) {
-    //   alert(`${name} already exists...`);
-    //   return;
-    // }
-    // if (emailExists(email, status.users)) {
-    //   alert(`${email} already exists....`);
-    //   return;
-    // }
     if (validateInputs(name, email, password)) {
-      let new_user = {
-        name: name,
-        email: email,
-        password: password,
-        balance: 0,
-      };
-      axios.post(url, new_user).then((response) => {
-        if (response.data === "ALREADY_EXISTS") {
-          alert(`${new_user.name} or ${new_user.email} already exists`);
-          return;
-        } else {
-          setShow(false);
-        }
-      })
-      .catch(error => {
-        console.error(error)
-        alert(`${error} happened when processing this request`);
-        setShow(true)
-      });
+      createAccountWithEmailAndPassword({ email, password });
+      setShow(false)
+      setCreated(true)
+    } else {
+      console.log("invalid data, what are you going to do");
     }
   };
   const validateInputs = (name, email, pwd) => {

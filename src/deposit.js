@@ -1,55 +1,75 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "./context";
-import Card from "./context";
-import {getUserObject} from "./utils"
+import Card from "./card";
+import { getUserObject } from "./utils";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { firebaseConfig } from "./firebase";
+import { initializeApp } from "firebase/app";
+import axios from "axios";
+
+const app = initializeApp(firebaseConfig);
 
 const Deposit = () => {
   const [show, setShow] = useState(false);
   const [amount, setAmount] = useState(0.0);
   const [balance, setBalance] = useState(0.0);
-  const { status, setContext } = useContext(UserContext);
+  const [account, setAccount] =useState({})
+
   useEffect(() => {
-    console.log("Rendering ...", status);
-    console.log(
-      "Current user balance:",
-      status.current_user !== undefined
-        ? status.current_user.balance
-        : "Not defined"
-    );
-    setShow(status.current_user !== undefined);
-    setBalance(
-      status.current_user !== undefined ? status.current_user.balance : null
-    );
-  },[status]);
+    console.log("Rendering ...");
+    // request user data to backend
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uid = user.uid;
+        const email = user.email
+        const account = {uid,email}
+        console.log("user logged in", uid);
+        let url = 'http://localhost:3001/accounts/data'
+
+        axios.get(url,{params:account}).then(res=>{
+          console.log(res)
+        })
+        setShow(true);
+        // ...
+      } else {
+        // User is signed out
+        // ...
+        setShow(false);
+      }
+    });
+  }, []);
   const handleDeposit = () => {
     console.log("amount: ", amount);
     console.log("amount as float: ", parseInt(amount));
-    console.log("user object: ", status.current_user);
-    console.log(
-      "user object balance as float: ",
-      parseFloat(status.current_user.balance),
-      typeof status.current_user.balance
-    );
 
-    let newBalance =
-      parseFloat(status.current_user.balance) + parseFloat(amount);
-    console.log("new balance: ", newBalance);
-    setAmount(0.0);
-    setBalance(newBalance);
+    // console.log("user object: ", status.current_user);
+    // console.log(
+    //   "user object balance as float: ",
+    //   parseFloat(status.current_user.balance),
+    //   typeof status.current_user.balance
+    // );
+    // let newBalance =
+    //   parseFloat(status.current_user.balance) + parseFloat(amount);
+    // console.log("new balance: ", newBalance);
+    // setAmount(0.0);
+    // setBalance(newBalance);
 
-    let newUsers = status.users.map((user) => {
-      if (user.name === status.current_user.name) {
-        user.balance = newBalance;
-      }
-      return user;
-    });
+    // let newUsers = status.users.map((user) => {
+    //   if (user.name === status.current_user.name) {
+    //     user.balance = newBalance;
+    //   }
+    //   return user;
+    // });
 
-    console.log(newUsers);
-    setContext({
-      users: newUsers,
-      current_user: getUserObject(status.current_user.name, newUsers),
-    });
-    console.log(status);
+    // console.log(newUsers);
+    // setContext({
+    //   users: newUsers,
+    //   current_user: getUserObject(status.current_user.name, newUsers),
+    // });
+    // console.log(status);
   };
   return (
     <Card

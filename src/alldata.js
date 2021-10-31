@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import Card from "./context";
+import Card from "./card";
 import axios from "axios";
 
 const AllData = () => {

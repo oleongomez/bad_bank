@@ -10,14 +10,15 @@ import AllData from "./alldata";
 import NavBar from "./navbar";
 import CreateAccount from "./createaccount";
 import { UserContext, HashRouter, Route } from "./context";
+import Logout from "./logout";
 
 const Spa = () => {
-  const [status, setContext] = useState({ users: [], current_user: undefined });
+  const [status, setContext] = useState({current_user: undefined });
   return (
     <HashRouter>
       <div>
-        <NavBar />
         <UserContext.Provider value={{ status, setContext }}>
+          <NavBar />
           <Route path="/" exact component={Home} />
           <Route path="/createaccount/" component={CreateAccount} />
           <Route path="/login/" component={Login} />
@@ -25,6 +26,7 @@ const Spa = () => {
           <Route path="/withdraw/" component={Withdraw} />
           <Route path="/balance/" component={Balance} />
           <Route path="/alldata/" component={AllData} />
+          <Route path="/logout/" component={Logout} />
         </UserContext.Provider>
       </div>
     </HashRouter>
