@@ -25,20 +25,22 @@ const analytics = getAnalytics(firebaseApp);
 export const createAccountWithEmailAndPassword = (account) => {
     let email = account.email
     let password = account.password
+    let result = 
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in
       const user = userCredential.user;
       console.log(user)
-      // ...
+      return(user)
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode)
       console.log(errorMessage)
-      // ..
+      return ({errorCode,errorMessage})
     });
+    return result
 };
 export function signIntoAccountWithEmailAndPassword(account){
   let email = account.email

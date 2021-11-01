@@ -11,6 +11,7 @@ import NavBar from "./navbar";
 import CreateAccount from "./createaccount";
 import { UserContext, HashRouter, Route } from "./context";
 import Logout from "./logout";
+import Transfer from "./transfer";
 
 const Spa = () => {
   const [status, setContext] = useState({current_user: undefined });
@@ -27,6 +28,7 @@ const Spa = () => {
           <Route path="/balance/" component={Balance} />
           <Route path="/alldata/" component={AllData} />
           <Route path="/logout/" component={Logout} />
+          <Route path="/transfer/" component={Transfer} />
         </UserContext.Provider>
       </div>
     </HashRouter>

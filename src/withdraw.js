@@ -1,75 +1,52 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "./context";
 import Card from "./card";
-import {getUserObject} from "./utils"
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
-const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    const uid = user.uid;
-    // ...
-  } else {
-    // User is signed out
-    // ...
-  }
-});
-
+import axios from "axios";
 const Withdraw = () => {
-  const [show, setShow] = useState(false);
-  const [show_overdraft, setShowOverdraft] = useState(false)
+  const [show_overdraft, setShowOverdraft] = useState(false);
   const [amount, setAmount] = useState(0.0);
-  const [balance, setBalance] = useState(0.0);
+  const [updated, setUpdated] = useState(false);
+
+  const url = "http://localhost:3001/accounts/data";
+  const update_url = "http://localhost:3001/accounts/update_balance";
+
+  const [account, setAccount] = useState({});
   const { status, setContext } = useContext(UserContext);
   useEffect(() => {
-    console.log("Rendering ...", status);
-    console.log(
-      "Current user balance:",
-      status.current_user !== undefined
-        ? status.current_user.balance
-        : "Not defined"
-    );
-    setShow(status.current_user !== undefined);
-    setBalance(
-      status.current_user !== undefined ? status.current_user.balance : null
-    );
-  },[status]);
+    console.log("Deposit context status: ", status);
+    if (status.current_user !== undefined) {
+      axios
+        .post(url, {
+          unique_id: status.current_user.user.uid,
+          email: status.current_user.user.email,
+        })
+        .then((res) => {
+          console.log(res.data);
+          setAccount(res.data);
+          setUpdated(false);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [updated]);
   const handleWithdraw = () => {
     console.log("amount: ", amount);
-    console.log("amount as float: ", parseInt(amount));
-    console.log("user object: ", status.current_user);
-    console.log(
-      "user object balance as float: ",
-      parseFloat(status.current_user.balance),
-      typeof status.current_user.balance
-    );
-
-    let newBalance =
-      parseFloat(status.current_user.balance) - parseFloat(amount);
-    if(newBalance<0){
-        setShowOverdraft(true)
-        return
-    }
-    console.log("new balance: ", newBalance);
-    setAmount(0.0);
-    setBalance(newBalance);
-
-    let newUsers = status.users.map((user) => {
-      if (user.name === status.current_user.name) {
-        user.balance = newBalance;
-      }
-      return user;
-    });
-
-    console.log(newUsers);
-    setContext({
-      users: newUsers,
-      current_user: getUserObject(status.current_user.name, newUsers),
-    });
-    console.log(status);
-    setShowOverdraft(false)
+    console.log("amount as float: ", parseFloat(amount));
+    axios
+      .post(update_url, { ...account, amount: parseFloat(amount) * -1 })
+      .then((value) => {
+        console.log("handle_withdraw: ", value);
+        if (value.data === "INVALID_OPERATION_OVERDRAFT") {
+          console.log("Overdraft protection");
+          setShowOverdraft(true);
+        } else {
+          setAccount(value);
+          setUpdated(true);
+          setAmount(0.0);
+          setShowOverdraft(false);
+        }
+      });
   };
   return (
     <Card
@@ -77,37 +54,38 @@ const Withdraw = () => {
       header="Withdraw"
       status={""}
       body={
-        show ? (
-          <>
-            Balance :$
-            {balance}
-            <br />
-            Withdraw Amount:
-            <input
-              type="input"
-              className="form-control"
-              id="amount"
-              placeholder="Amount to withdraw"
-              value={amount}
-              onChange={(e) => setAmount(e.currentTarget.value)}
-            />
-            <br />
-            <button
-              type="submit"
-              className="btn-primary"
-              onClick={handleWithdraw}
-            >
-              Withdraw
-            </button>
-            {show_overdraft ? <div className="text-danger">*The amount ${amount} cannot be withdrawn</div>: <></>}
-          </>
-        ) : (
-          <>
-            <h3>Must login to show this page</h3>
-          </>
-        )
+        <>
+          Balance : ${account.balance}
+          <br />
+          Withdraw Amount:
+          <input
+            type="input"
+            className="form-control"
+            id="amount"
+            placeholder="Amount to withdraw"
+            value={amount}
+            onChange={(e) => {
+              setShowOverdraft(false)
+              setAmount(e.currentTarget.value)}}
+          />
+          <br />
+          <button
+            type="submit"
+            className="btn-primary"
+            onClick={handleWithdraw}
+          >
+            Withdraw
+          </button>
+          {show_overdraft ? (
+            <div className="text-danger">
+              *The amount ${amount} cannot be withdrawn
+            </div>
+          ) : (
+            <></>
+          )}
+        </>
       }
-    ></Card>
+    />
   );
 };
-export default Withdraw
+export default Withdraw;

@@ -1,75 +1,48 @@
 import { useState, useContext, useEffect } from "react";
 import { UserContext } from "./context";
 import Card from "./card";
-import { getUserObject } from "./utils";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { firebaseConfig } from "./firebase";
-import { initializeApp } from "firebase/app";
 import axios from "axios";
 
-const app = initializeApp(firebaseConfig);
-
 const Deposit = () => {
-  const [show, setShow] = useState(false);
   const [amount, setAmount] = useState(0.0);
-  const [balance, setBalance] = useState(0.0);
-  const [account, setAccount] =useState({})
+  const [updated, setUpdated] = useState(false)
+
+  const url = "http://localhost:3001/accounts/data";
+  const update_url = "http://localhost:3001/accounts/update_balance";
+
+  const [account, setAccount] = useState({});
+  const { status, setContext } = useContext(UserContext);
 
   useEffect(() => {
-    console.log("Rendering ...");
-    // request user data to backend
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uid = user.uid;
-        const email = user.email
-        const account = {uid,email}
-        console.log("user logged in", uid);
-        let url = 'http://localhost:3001/accounts/data'
-
-        axios.get(url,{params:account}).then(res=>{
-          console.log(res)
+    console.log("Deposit context status: ", status);
+    if (status.current_user!== undefined) {
+      axios
+        .post(url,{
+              unique_id: status.current_user.user.uid,
+              email: status.current_user.user.email,
+            }
+        )
+        .then((res) => {
+          console.log(res.data);
+          setAccount(res.data);
+          setUpdated(false)
         })
-        setShow(true);
-        // ...
-      } else {
-        // User is signed out
-        // ...
-        setShow(false);
-      }
-    });
-  }, []);
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  },[updated]);
+  //TODO: validate that only accepts numbers and positive
+  //TODO: Round the balance to 3 digits
   const handleDeposit = () => {
     console.log("amount: ", amount);
-    console.log("amount as float: ", parseInt(amount));
-
-    // console.log("user object: ", status.current_user);
-    // console.log(
-    //   "user object balance as float: ",
-    //   parseFloat(status.current_user.balance),
-    //   typeof status.current_user.balance
-    // );
-    // let newBalance =
-    //   parseFloat(status.current_user.balance) + parseFloat(amount);
-    // console.log("new balance: ", newBalance);
-    // setAmount(0.0);
-    // setBalance(newBalance);
-
-    // let newUsers = status.users.map((user) => {
-    //   if (user.name === status.current_user.name) {
-    //     user.balance = newBalance;
-    //   }
-    //   return user;
-    // });
-
-    // console.log(newUsers);
-    // setContext({
-    //   users: newUsers,
-    //   current_user: getUserObject(status.current_user.name, newUsers),
-    // });
-    // console.log(status);
+    console.log("amount as float: ", parseFloat(amount));
+    axios.post(update_url,{...account, amount:parseFloat(amount)}).then(value=>{
+      console.log(value)
+      setAccount(value)
+      setUpdated(!updated)
+      setAmount(0.0)
+    })
   };
   return (
     <Card
@@ -77,10 +50,9 @@ const Deposit = () => {
       header="Deposit"
       status={""}
       body={
-        show ? (
           <>
-            Balance :$
-            {balance}
+            Balance : $ 
+            {account.balance}
             <br />
             Deposit Amount:
             <input
@@ -100,13 +72,9 @@ const Deposit = () => {
               Deposit
             </button>
           </>
-        ) : (
-          <>
-            <h3>Must login to show this page</h3>
-          </>
-        )
+        
       }
-    ></Card>
+    />
   );
 };
 export default Deposit;

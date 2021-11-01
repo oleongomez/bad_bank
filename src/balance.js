@@ -1,27 +1,45 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./context";
-import { firebaseApp, getAuth, onAuthStateChanged } from "firebase/auth";
-
-const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    const uid = user.uid;
-    // ...
-  } else {
-    // User is signed out
-    // ...
-  }
-});
-
+import Card from "./card";
+import CreateAccount from "./createaccount";
+import axios from "axios";
 const Balance = () => {
-  const ctx = useContext(UserContext);
-  return (
-    <>
-      <h3>Balance</h3>
-      {JSON.stringify(ctx.users)}
-    </>
-  );
+  const url = "http://localhost:3001/accounts/data";
+  const [account, setAccount] = useState(null);
+  const { status, setContext } = useContext(UserContext);
+  useEffect(() => {
+    console.log("Balance context status: ", status);
+    if (status.current_user!== undefined) {
+      axios
+        .post(url,{
+              unique_id: status.current_user.user.uid,
+              email: status.current_user.user.email,
+            }
+        )
+        .then((res) => {
+          console.log(res.data);
+          setAccount(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, []);
+  const get_balance = (account) => {
+    if (account !== null) {
+      return (
+        <>
+          <Card
+            bgcolor="primary"
+            header={account.name}
+            body={<>Current Balance: {account.balance}</>}
+          />
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+  return get_balance(account);
 };
 export default Balance;

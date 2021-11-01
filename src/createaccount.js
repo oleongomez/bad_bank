@@ -24,43 +24,6 @@ const CreateAccount = () => {
   const [password, setPassword] = useState("");
   let { status, setContext } = useContext(UserContext);
   console.log(status);
-  useEffect(() => {
-    console.log(`Use effect: show: ${show} created: ${created}`)
-    const auth = getAuth();
-    if(created) {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("user logged in")
-        const uid = user.uid;
-        const email = user.email;
-
-        let new_user = {
-          unique_id: uid,
-          name: name,
-          email: email,
-          password: password,
-          balance: 0,
-        }
-        console.log("Here")
-      try{
-        axios
-          .post(url, new_user)
-          .then((response) => {
-            console.log(response);
-            setShow(false);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        }catch(error){
-          console.log('asdfasdfasdf')
-        }
-      } else {
-        //logout
-      }
-    });
-  }
-  }, []);
 
   const clearForm = () => {
     setName("");
@@ -70,13 +33,33 @@ const CreateAccount = () => {
     setPassword("");
     setShowRequiredPassword(true);
     setShow(true);
-    setCreated(false)
+    setCreated(false);
   };
   const handleCreate = () => {
     if (validateInputs(name, email, password)) {
-      createAccountWithEmailAndPassword({ email, password });
-      setShow(false)
-      setCreated(true)
+      let result = createAccountWithEmailAndPassword({ email, password });
+      console.log("create account result", result);
+      result
+        .then((res) => {
+          if ("errorCode" in res) {
+            console.log(res.errorCode, res.errorMessage);
+          } else {
+            console.log("Lets create a new account")
+            let new_user = {
+              unique_id: res.uid,
+              name: name,
+              email: res.email,
+              balance:0
+            }
+            axios.post(url, new_user).then((response) => {
+              console.log(response);
+              setShow(false);
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
       console.log("invalid data, what are you going to do");
     }

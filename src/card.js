@@ -5,7 +5,7 @@ const Card = (props) => {
       return "card mb-3 " + bg + txt;
     };
     return (
-      <div className={classes()} style={{ maxWidth: "18rem" }}>
+      <div className={classes()} style={{ maxWidth: "20rem" }}>
         <div className="card">
           <h5 className="card-header bg-primary text-light">{props.header}</h5>
           <div className="card-body">
