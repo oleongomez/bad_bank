@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./context";
 import Card from "./card";
-import CreateAccount from "./createaccount";
 import axios from "axios";
 import { Redirect } from "react-router";
 const Balance = () => {
   const url = "http://localhost:3001/accounts/data";
-  const [account, setAccount] = useState(null);
-  const { status, setContext } = useContext(UserContext);
+  const [account, setAccount] = useState({});
+  const { status} = useContext(UserContext);
   useEffect(() => {
     console.log("Balance context status: ", status);
     if (status.current_user!== undefined) {
