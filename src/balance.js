@@ -3,6 +3,7 @@ import { UserContext } from "./context";
 import Card from "./card";
 import CreateAccount from "./createaccount";
 import axios from "axios";
+import { Redirect } from "react-router";
 const Balance = () => {
   const url = "http://localhost:3001/accounts/data";
   const [account, setAccount] = useState(null);
@@ -25,6 +26,7 @@ const Balance = () => {
         });
     }
   }, []);
+
   const get_balance = (account) => {
     if (account !== null) {
       return (
@@ -37,7 +39,7 @@ const Balance = () => {
         </>
       );
     } else {
-      return <></>;
+      return <Redirect to="/login/"/>
     }
   };
   return get_balance(account);

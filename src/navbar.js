@@ -5,7 +5,7 @@ import { UserContext } from "./context";
 
 const NavBar = () => {
   const [links, setLinks] = useState([
-    { text: "BadBank", address: "/", active: false, user_needed: false },
+    { text: "BadBank", address: "/home/", active: false, user_needed: false },
     {
       text: "Create Account",
       address: "/createaccount/",

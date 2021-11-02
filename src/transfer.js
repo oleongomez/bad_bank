@@ -1,8 +1,10 @@
-import Card from "./card";
-import { Form, Button, Row, Col, FloatingLabel } from "react-bootstrap";
+import { Form, Button, Row, FloatingLabel } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "./context";
+import { Redirect } from "react-router";
 import axios from "axios";
+
+import Card from "./card";
+import { UserContext } from "./context";
 
 const Transfer = () => {
   const [show_overdraft, setShowOverdraft] = useState(false);
@@ -86,74 +88,83 @@ const Transfer = () => {
       });
   };
 
-  return (
-    <>
-      <Card
-        bgcolor="primary"
-        header="Transfer money"
-        status={""}
-        body={
-          <>
-            Balance : ${account.balance}
-            <Form>
-              <Row className="mb-3">
-                <Form.Group>
-                  <FloatingLabel
-                    label="Enter recipient email"
-                    className="form-label mb-3"
-                  >
-                    <Form.Control
-                      type="email"
-                      placeholder="name@example.com"
-                      onChange={(e) => {
-                        setRecipientEmail(e.currentTarget.value);
-                      }}
-                    />
-                  </FloatingLabel>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    onClick={handle_search}
-                  >
-                    Search
-                  </Button>
-                </Form.Group>
-              </Row>
-              {found ? (
+  const returnCard = () => {
+    if (status.current_user !== undefined) {
+      return (
+        <Card
+          bgcolor="primary"
+          header="Transfer money"
+          status={""}
+          body={
+            <>
+              Balance : ${account.balance}
+              <Form>
                 <Row className="mb-3">
                   <Form.Group>
                     <FloatingLabel
-                      label="Amount to transfer"
+                      label="Enter recipient email"
                       className="form-label mb-3"
                     >
                       <Form.Control
-                        type="input"
-                        id="amount"
-                        placeholder="Amount to withdraw"
-                        value={amount}
+                        type="email"
+                        placeholder="name@example.com"
                         onChange={(e) => {
-                          setAmount(e.currentTarget.value);
+                          setRecipientEmail(e.currentTarget.value);
                         }}
                       />
                     </FloatingLabel>
                     <Button
+                      variant="primary"
                       type="submit"
-                      className="btn-primary"
-                      onClick={handle_transfer}
+                      onClick={handle_search}
                     >
-                      Transfer
+                      Search
                     </Button>
                   </Form.Group>
                 </Row>
-              ) : (
-                <></>
-              )}
-            </Form>
-          </>
-        }
-      />
-    </>
-  );
+                {found ? (
+                  <Row className="mb-3">
+                    <Form.Group>
+                      <FloatingLabel
+                        label="Amount to transfer"
+                        className="form-label mb-3"
+                      >
+                        <Form.Control
+                          type="input"
+                          id="amount"
+                          placeholder="Amount to withdraw"
+                          value={amount}
+                          onChange={(e) => {
+                            setAmount(e.currentTarget.value);
+                          }}
+                        />
+                      </FloatingLabel>
+                      <Button
+                        type="submit"
+                        className="btn-primary"
+                        onClick={handle_transfer}
+                      >
+                        Transfer
+                      </Button>
+                    </Form.Group>
+                  </Row>
+                ) : (
+                  <></>
+                )}
+              </Form>
+            </>
+          }
+        />
+      );
+    } else {
+      return (
+        <>
+          <Redirect to="/login/" />
+        </>
+      );
+    }
+  };
+  return returnCard();
 };
 
 export default Transfer;

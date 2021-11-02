@@ -1,7 +1,10 @@
 import { useState, useContext, useEffect } from "react";
+import { Redirect } from "react-router";
+
 import { UserContext } from "./context";
 import Card from "./card";
 import axios from "axios";
+
 const Withdraw = () => {
   const [show_overdraft, setShowOverdraft] = useState(false);
   const [amount, setAmount] = useState(0.0);
@@ -48,44 +51,56 @@ const Withdraw = () => {
         }
       });
   };
-  return (
-    <Card
-      bgcolor="primary"
-      header="Withdraw"
-      status={""}
-      body={
+  const returnCard = () => {
+    if (status.current_user !== undefined) {
+      return (
+        <Card
+          bgcolor="primary"
+          header="Withdraw"
+          status={""}
+          body={
+            <>
+              Balance : ${account.balance}
+              <br />
+              Withdraw Amount:
+              <input
+                type="input"
+                className="form-control"
+                id="amount"
+                placeholder="Amount to withdraw"
+                value={amount}
+                onChange={(e) => {
+                  setShowOverdraft(false);
+                  setAmount(e.currentTarget.value);
+                }}
+              />
+              <br />
+              <button
+                type="submit"
+                className="btn-primary"
+                onClick={handleWithdraw}
+              >
+                Withdraw
+              </button>
+              {show_overdraft ? (
+                <div className="text-danger">
+                  *The amount ${amount} cannot be withdrawn
+                </div>
+              ) : (
+                <></>
+              )}
+            </>
+          }
+        />
+      );
+    } else {
+      return (
         <>
-          Balance : ${account.balance}
-          <br />
-          Withdraw Amount:
-          <input
-            type="input"
-            className="form-control"
-            id="amount"
-            placeholder="Amount to withdraw"
-            value={amount}
-            onChange={(e) => {
-              setShowOverdraft(false)
-              setAmount(e.currentTarget.value)}}
-          />
-          <br />
-          <button
-            type="submit"
-            className="btn-primary"
-            onClick={handleWithdraw}
-          >
-            Withdraw
-          </button>
-          {show_overdraft ? (
-            <div className="text-danger">
-              *The amount ${amount} cannot be withdrawn
-            </div>
-          ) : (
-            <></>
-          )}
+          <Redirect to="/login/" />
         </>
-      }
-    />
-  );
+      );
+    }
+  };
+  return returnCard();
 };
 export default Withdraw;
