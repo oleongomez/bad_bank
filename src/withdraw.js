@@ -10,8 +10,8 @@ const Withdraw = () => {
   const [amount, setAmount] = useState(0.0);
   const [updated, setUpdated] = useState(false);
 
-  const url = "http://localhost:3001/accounts/data";
-  const update_url = "http://localhost:3001/accounts/update_balance";
+  const url = "http://ec2-54-151-63-111.us-west-1.compute.amazonaws.com:3001/accounts/data";
+  const update_url = "http://ec2-54-151-63-111.us-west-1.compute.amazonaws.com:3001/accounts/update_balance";
 
   const [account, setAccount] = useState({});
   const { status, setContext } = useContext(UserContext);

@@ -4,7 +4,7 @@ import Card from "./card";
 import axios from "axios";
 import { Redirect } from "react-router";
 const Balance = () => {
-  const url = "http://localhost:3001/accounts/data";
+  const url = "http://ec2-54-151-63-111.us-west-1.compute.amazonaws.com:3001/accounts/data";
   const [account, setAccount] = useState({});
   const { status} = useContext(UserContext);
   useEffect(() => {

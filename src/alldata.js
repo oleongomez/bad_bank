@@ -6,7 +6,7 @@ const AllData = () => {
   const [accounts, setAccounts] = useState([]);
   const get_all_accounts = () => {
     axios
-      .get("http://localhost:3001/accounts/all_data")
+      .get("http://ec2-54-151-63-111.us-west-1.compute.amazonaws.com:3001/accounts/all_data")
       .then((res) => {
         console.log(res.data);
         const allAccounts = res.data;

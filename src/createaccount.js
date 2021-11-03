@@ -12,7 +12,7 @@ import axios from "axios";
 import { createAccountWithEmailAndPassword } from "./firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-let url = "http://localhost:3001/accounts/add";
+let url = "http://ec2-54-151-63-111.us-west-1.compute.amazonaws.com:3001/accounts/add";
 const CreateAccount = () => {
   const [show, setShow] = useState(true);
   const [created, setCreated] = useState(false);
